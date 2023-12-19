@@ -1,0 +1,13 @@
+---
+title: "Trabajo sobre la evolución de los alquileres en España"
+author: "Javier Belenguer Esteban, Juan Bosco Pujol Cerdá"
+date: ""
+categories: [news, code, analysis]
+image: "image.jpg"
+---
+
+This is a post with executable code.
+
+```{r}
+1 + 1
+```
