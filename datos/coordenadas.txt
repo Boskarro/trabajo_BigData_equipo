@@ -1,0 +1,19 @@
+Andalucía: 37°23′00″N 5°59′00″O
+Aragón: 41°N 1°O
+Principado de Asturias: 43°20′00″N 6°00′00″O
+Islas Baleares: 39°30′N 3°00′E
+Canarias: 28°28′00″N 16°15′00″O
+Cantabria: 43°20′00″N 4°00′00″O
+Castilla la Mancha: 39°52′00″N 4°01′00″O
+Castilla y León: 41°23′00″N 4°27′00″O
+Cataluña: 41°49′N 1°28′E
+Comunidad Valenciana: 39°30′N 0°45′O
+Extremadura: 39°12′N 6°09′O
+Galicia: 42°45′00″N 7°53′00″O
+La Rioja: 42°15′N 2°30′O
+Comunida de Madrid: 40°30′00″N 3°40′00″O
+Región de Murcia: 38°00′00″N 1°50′00″O
+Comunidad Foral de Navarra: 42°49′00″N 1°39′00″O
+País Vasco: 42°59′23″N 2°37′08″O
+Ceuta: 35°53′12″N 5°18′00″O
+Melilla: 35°16′57″N 2°56′51″O

@@ -1,0 +1,31 @@
+AXIS-VERSION="2006";
+CREATION-DATE="20231215";
+CHARSET="ANSI";
+SUBJECT-AREA="Índice de Precios de Vivienda. Medias anuales";
+SUBJECT-CODE="2";
+MATRIX="CCAA_M";
+TITLE="Índices por CCAA: general, vivienda nueva y de segunda mano";
+CONTENTS="Índices";
+CODEPAGE="iso-8859-15";
+DESCRIPTION="";
+COPYRIGHT=YES;
+DECIMALS=1;
+SHOWDECIMALS=1;
+STUB="Comunidades y Ciudades Autónomas","General, vivienda nueva y de segunda mano";
+HEADING="Índices y tasas","Periodo";
+VALUES("Comunidades y Ciudades Autónomas")="Nacional","01 Andalucía","02 Aragón","03 Asturias, Principado de",
+"04 Balears, Illes","05 Canarias","06 Cantabria","07 Castilla y León",
+"08 Castilla - La Mancha","09 Cataluña","10 Comunitat Valenciana","11 Extremadura",
+"12 Galicia","13 Madrid, Comunidad de","14 Murcia, Región de",
+"15 Navarra, Comunidad Foral de","16 País Vasco","17 Rioja, La","18 Ceuta",
+"19 Melilla";
+VALUES("General, vivienda nueva y de segunda mano")="General";
+VALUES("Índices y tasas")="Media anual";
+VALUES("Periodo")="2022";
+CODES("Comunidades y Ciudades Autónomas")="CA00","CA01","CA02","CA03","CA04","CA05","CA06","CA07","CA08","CA09","CA10","CA11","CA12",
+"CA13","CA14","CA15","CA16","CA17","CA18","CA19";
+MAP("Comunidades y Ciudades Autónomas")="spain_regions_img_ind";
+PRECISION("Índices y tasas","Media anual")=3;
+SOURCE="Instituto Nacional de Estadística";
+UNITS="Índice";
+DATA=141.675 136.786 131.96 126.182 157.034 137.24 136.343 125.987 118.284 151.701 130.636 114.612 127.685 157.232 129.515 125.153 131.765 130.006 154.237 151.476;

@@ -1,0 +1,30 @@
+﻿Año;Periodo;Salariomedio
+2006;Año;16.849
+2007;Año;18.087
+2008;Año;18.996
+2009;Año;19.085
+2010;Año;19.113
+2011;Año;19.102
+2012;Año;18.601
+2013;Año;18.505
+2014;Año;18.420
+2015;Año;18.645
+2016;Año;18.835
+2017;Año;19.172
+2018;Año;19.809
+2019;Año;20.566
+2020;Año;20.503
+;;
+;;
+"Métrica:""Salario medio""";;
+"Fuente:""Agencia Tributaria""";;
+"Clasificación:""""";;
+"Unidad:""Euros""";;
+"Escala:""Unidades""";;
+"EscalaFactorPotencia10:""0""";;
+"SonDatosNumericos:""True""";;
+;;
+;;
+"Url:""https://www.epdata.es/evolucion-salario-medio-espana/39f01606-7075-4c27-9c72-0a903fa050d4""";;
+"Titulo:""Evolución del salario medio en España""";;
+"Subtitulo:""Según la Agencia Tributaria""";;
