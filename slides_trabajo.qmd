@@ -1,0 +1,609 @@
+---
+title: "Análisis del coste de vida"
+editor: visual
+date: 2023-12-20              
+date-format: short
+format:
+  revealjs:
+    code-fold: true
+    theme: blood
+    scrollable: true
+    slide-level: 2
+    height: 900
+    width: 1600
+    toc: false
+    center-title-slide: true
+    title-slide-attributes: #- atributos para la slide de titulo
+      data-background-color: "#0000EE"   #- color de R-ladies
+    preview-links: auto  #- true: abre un iframe en lugar de abrir ventana
+    link-external-newwindow: true
+    background-transition: zoom
+    transition: fade
+    fontcolor: "#262d36"
+    highlight-style: zenburn
+    code-line-numbers: true
+    number-sections: false
+    slide-number: c/t  
+    incremental: false   
+footer: |
+  Slides hechas con [Quarto](https://quarto.org/)
+---
+## TEMÁTICA DEL TRABAJO 
+
+*VIVIR* Es más caro --> 🤑🤑🤑🤑
+¿¿¿¿¿Por qué????? --> 😭😭🤬🤬
+
+Muy sencillo: aumento de precios a mayor ritmo que el crecimiento salarial.
+
+
+💸 **PRECIOS** 💸
+
+Hemos usado datos sobre índices de precios tanto generales como por grupos COICOP.
+
+También nos hemos centrado mucho en el tema de: 
+
+🏡**VIVIENDA Y ALQUILER**🏡 (tema de gran preocupación para los adultos jóvenes🙋️)
+
+¿¿De dónde los sacamos??
+
+Principalmente de páginas conocidas como INE, Eurostat, OCDE...
+
+*Truquito:* Google dataset search : De TODO hay [aquí](https://datasetsearch.research.google.com/) 
+---
+
+## Algunos de nuestros gráficos
+
+```{r}
+library(gganimate)
+library(tidyverse)
+IPC<- rio::import("./datos/ipc_bueno.csv")
+
+df_IPC <- IPC %>%
+  rename(IPC = indice_precios_consumo_tasas_variacion) %>%
+  select(indicadores,grupos_coicop_nombre,provincias_nombre,periodos_id,IPC) %>%
+  filter(periodos_id %in% c("2002M01","2003M01","2004M01","2005M01","2006M01","2007M01","2008M01","2009M01","2010M01","2011M01","2012M01","2013M01","2014M01","2015M01","2016M01"))
+
+
+df_IPC_valores <- df_IPC %>%
+  filter(indicadores == "Índices") %>%
+  filter(provincias_nombre == "España") %>%
+  mutate(periodos_id = as.Date(paste0(substr(periodos_id, 1, 4), substr(periodos_id, 6, 7), "-01"), format = "%Y%m-%d"))
+
+plot_IPC_valores <- ggplot(df_IPC_valores, aes(periodos_id, IPC, group = grupos_coicop_nombre, color = grupos_coicop_nombre)) + 
+  geom_line(size = 0.9) +
+  ggthemes::theme_stata() +
+  theme(
+    axis.text.x = element_text(
+      angle = 75, hjust = 1, vjust = 1, size = 5, margin = margin(
+        r = 5, b = 5, l = 5)),
+    axis.text.y = element_text(size = 5),
+    panel.spacing = unit(0.75, "lines"),
+    legend.title = element_text(size = 8),
+    legend.key.size = unit(1, "cm"),
+    legend.key.height = unit(1, "cm"),
+    legend.key.width = unit(0.1,"cm"),
+    legend.direction = "vertical",
+    legend.position = "none") +
+  labs(
+    title = "Evolución IPC por grupos COICOP",
+    subtitle = "Serie 2002 - 2016",
+    x = NULL,
+    y = "IPC",
+    caption = "Fuente: datos.gob.es (Gobierno de España)",
+    color = "Grupos COICOP"
+  ) +
+  facet_wrap(
+    vars(grupos_coicop_nombre),
+    nrow = 4,
+    ncol = 4,
+    labeller = labeller(grupos_coicop_nombre = function(label) str_wrap(label, width = 20))) +
+  theme(strip.text = element_text(size = 8))
+
+plot_animado <- plot_IPC_valores + transition_reveal(periodos_id) + view_follow(fixed_y = TRUE)
+
+plot_animado
+```
+
+---
+## Evolución del IPC general de precios de alquiler por CCAA
+
+```{r}
+library(patchwork)
+datos <- "./datos/DATOS_VIVIENDA.xlsx"
+info <- rio::import(datos)
+
+coloresg1 <- c("#66CDAA","#A52A2A","#53868B","#458B00")
+coloresg2 <- c("darkgoldenrod3","#9A32CD", "deeppink3", "#EEEE00")
+coloresg3 <- c("#8B7E66", "#00FF7F", "#7FFF00","#00BFFF","#FF3030", "darkslategray")
+coloresg4 <- c("#EEC900","darkseagreen4", "#CD5555", "#EEA2AD")
+
+
+df_cca1 <- info %>%
+  pivot_wider(names_from = TAMAÑO, values_from = ÍNDICE) %>%
+  filter(COMUNIDAD %in% c("06 Cantabria", "02 Aragón", "03 Principado de Asturias", "12 Galicia"))
+
+df_cca2 <- info %>%
+  pivot_wider(names_from = TAMAÑO, values_from = ÍNDICE) %>%
+  filter(COMUNIDAD %in% c("07 Castilla y León", "08 Castilla La Mancha", "15 La Rioja", "11 Extremadura"))
+
+df_cca3 <- info %>%
+  pivot_wider(names_from = TAMAÑO, values_from = ÍNDICE) %>%
+  filter(COMUNIDAD %in% c("10 Comunitat Valenciana", "01 Andalucía", "13 Comunidad de Madrid", "14 Región de Murcia", "09 Cataluña"))
+
+df_cca4 <- info %>%
+  pivot_wider(names_from = TAMAÑO, values_from = ÍNDICE) %>%
+  filter(COMUNIDAD %in% c("16 Ceuta", "17 Melilla", "04 Illes Balears", "05 Canarias"))
+
+
+CCAAg1<- ggplot(df_cca1,
+              aes(
+                AÑO,
+                General,
+                color = COMUNIDAD)) +
+  geom_line(size = 0.95) +
+  scale_color_manual(values = coloresg1) + 
+  labs(
+    y = "IPC") +
+  ggthemes::theme_stata() 
+  
+CCAAg2<- ggplot(df_cca2,
+                aes(
+                  AÑO,
+                  General,
+                  color = COMUNIDAD)) +
+  geom_line(size = 0.95) +
+  scale_color_manual(values = coloresg2) + 
+  labs(
+    color = NULL,
+    y = "IPC") +
+  ggthemes::theme_stata()
+
+CCAAg3<- ggplot(df_cca3,
+                aes(
+                  AÑO,
+                  General,
+                  color = COMUNIDAD)) +
+  geom_line(size = 0.95) +
+  scale_color_manual(values = coloresg3) + 
+  labs(
+  color = NULL,
+  y = "IPC") +
+  ggthemes::theme_stata() 
+
+CCAAg4<- ggplot(df_cca4,
+                aes(
+                  AÑO,
+                  General,
+                  color = COMUNIDAD)) +
+  geom_line(size = 0.95) +
+  scale_color_manual(values = coloresg4) + 
+  labs(
+  color = NULL,
+  y = "IPC") +
+  ggthemes::theme_stata() 
+
+PLOT_CONJUNTO <- ((CCAAg1 + CCAAg2) / (CCAAg3 + CCAAg4)) +
+  plot_layout(guides = "collect") +
+  theme(
+    plot.title.position = "collect")  +
+  plot_annotation(
+    title = "Evolución del IPC general de \n precios de alquiler por CCAA agrupadas (2015 = 100)",
+    caption = "Fuente: INE") & ggthemes::theme_stata() & theme(
+      legend.position = "right",
+      legend.direction = "vertical",
+      legend.text = element_text(size = 5) ,
+      legend.key.size = unit(0.5,"cm"),
+      legend.title = element_text(size = 5),
+      plot.title = element_text(size = 12, hjust = 0.05))
+
+PLOT_CONJUNTO
+
+```
+
+## Evolución del Índice general de precios por tamaño de la vivienda
+
+```{r}
+library(plotly)
+datos <- "./datos/DATOS_VIVIENDA.xlsx"
+info <- rio::import(datos)
+
+df3 <- info %>%
+  filter(COMUNIDAD == "Total nacional")
+
+
+p<- ggplot(df3,
+       aes(
+  AÑO, 
+  ÍNDICE,
+  color = TAMAÑO)) +
+  geom_line(size = 0.95) +
+  ggthemes::theme_stata() + 
+  labs(
+  title = "Evolución del Índice general de precios de alquiler por tamaño de vivienda (2015 = 100).",
+  subtitle = "serie 2011 - 2021",
+  caption = "Fuente: INE")
+
+pp <- ggplotly(p)
+
+
+p_plotly <- pp %>%
+  layout(
+    legend = list(
+      title = "Tamaño",
+      font = list(
+        family = "Arial", 
+        size = 12
+      ),
+      bgcolor = "white",
+      bordercolor = "black",
+      borderwidth = 1,
+      itemsizing = "constant"  
+    )
+  )
+
+p_plotly <- p_plotly %>%
+  layout(
+    annotations = list(
+      list(
+        text = "Fuente: INE",
+        font = list(
+          family = "Arial",
+          size = 10
+        ),
+        x = 1,
+        y = -0.15,
+        showarrow = FALSE,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "right",
+        yanchor = "auto"
+      )
+    )
+  )
+
+p_plotly
+```
+
+## Tasa de emancipación para jóvenes de 18 -34 años
+
+```{r}
+library(tidyverse)
+Df_eman <- rio::import("./datos/TASA DE EMANCIPACION.csv")
+
+Df_good <- Df_eman %>%
+  mutate(Year = as.factor(Year)) %>%
+  select(Year, Tasa)
+
+plot_eman <-ggplot(Df_good, aes(Year, Tasa)) + geom_line(group = 1) +
+  labs(
+    title = "Tasa de emancipación para jóvenes de 18 -34 años.",
+    x = "Año",
+    y = "Tasa de emancipación",
+    caption = "Fuente: datos.gob.es (Gobierno de España)."
+  ) +
+  ggthemes::theme_stata()
+
+plot_eman
+
+```
+
+---
+## Distribución de la tenencia de vivienda por países europeos
+
+```{r}
+datos_europa<- "./datos/datos_europa.csv"
+datos_europa<- rio::import(datos_europa)
+datos_europa<- datos_europa %>% select(tenure,geo,OBS_VALUE)
+
+categorias<- c("OWN_L" = "Propietario,\n con hipoteca o préstamo", "OWN_NL" = "Propietario,\n sin hipoteca ni préstamo de vivienda pendiente", "RENT_FR" = "Inquilino,\n alquiler a precio reducido o gratis", "RENT_MKT" = "Inquilino,\n alquiler a precio de mercado")
+
+p<- ggplot(datos_europa, aes(x = geo, y = OBS_VALUE,  fill = tenure)) +
+  geom_col( position = "stack", color = "white") +
+  labs(title = "Distribución de la tenencia de vivienda por países europeos (2018)", 
+       x = "País", y = "%", caption = "Fuente:Eurostat") +
+  ggthemes::theme_stata() +
+  theme(
+    plot.title = element_text(size = 16, hjust = 0.5, face = "bold"),
+    legend.key.size = unit(0.2,"cm"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()) +
+  scale_fill_brewer(palette = "Set3") 
+p + scale_fill_manual(values = c("OWN_L" = "blue", "OWN_NL" = "red", "RENT_FR" = "yellow", "RENT_MKT" ="green" ), labels = categorias) + guides(fill = guide_legend( keywidth = 0.5, keyheight = 0.5, title.theme = element_text(size = 5), label.theme = element_text(size = 5)))
+```
+
+ ## Evolución  de la tenencia de la Vivienda
+
+```{r}
+######gráfico pastel
+
+##Cargamos los datos 
+d_tenencia<- "./datos/regimen_tenencia.csv"
+d_tenencia<- rio::import(d_tenencia)
+
+##Cambiamos la coma por el punto en la columna Total
+d_tenencia <- d_tenencia%>% mutate(Total = stringr::str_replace(Total, "," , "." ))
+str(d_tenencia)
+
+d_tenencia$Total <- as.numeric(d_tenencia$Total)
+
+Propiedad <- d_tenencia%>%
+  filter (Regimen_tenencia == "Propiedad") %>%
+  filter (CCAA == "Total Nacional") %>%
+  group_by(Periodo, Regimen_tenencia) 
+
+Alquiler_precio_mercado<- d_tenencia %>%
+  filter(Regimen_tenencia == "Alquiler a precio de mercado") %>%
+  group_by(Periodo, Regimen_tenencia)
+
+Alquiler_inferior_precio<- d_tenencia %>%
+  filter(Regimen_tenencia == "Alquiler inferior al precio de mercado") %>%
+  group_by(Periodo, Regimen_tenencia)
+
+Cesion<- d_tenencia %>% 
+  filter(Regimen_tenencia == "Cesión") %>%
+  group_by(Periodo, Regimen_tenencia)
+
+df_combined <- Propiedad %>%
+  full_join(Alquiler_precio_mercado) %>%
+  full_join(Alquiler_inferior_precio) %>%
+  full_join(Cesion) %>% filter(CCAA=="Total Nacional") 
+
+df_ordenado <- df_combined %>% 
+  arrange(Periodo)
+
+df_04 <- df_ordenado %>%
+  filter (Periodo == 2004)%>%
+  filter(CCAA =="Total Nacional") %>%
+  mutate(Total_2decimales = round(Total, 2),
+         csum = rev(cumsum(rev(Total_2decimales))),
+         posicion = Total_2decimales/2 + lead(csum, 1))%>%
+  mutate(posicion = ifelse(is.na(posicion), Total_2decimales/2, posicion))
+
+df_08 <- df_ordenado %>%
+  filter (Periodo == 2008)%>%
+  filter(CCAA== "Total Nacional") %>%
+  mutate(Total_2decimales = round(Total, 2),
+         csum = rev(cumsum(rev(Total_2decimales))),
+         posicion = Total_2decimales/2 + lead(csum, 1))%>%
+  mutate(posicion = ifelse(is.na(posicion), Total_2decimales/2, posicion))
+
+df_10 <- df_ordenado %>%
+  filter (Periodo == 2010)%>%
+  filter(CCAA == "Total Nacional") %>%
+  mutate(Total_2decimales = round(Total, 2),
+         csum = rev(cumsum(rev(Total_2decimales))),
+         posicion = Total_2decimales/2 + lead(csum, 1))%>%
+  mutate(posicion = ifelse(is.na(posicion), Total_2decimales/2, posicion))
+
+df_17 <- df_ordenado %>%
+  filter (Periodo == 2017)%>%
+  filter(CCAA== "Total Nacional")%>%
+  mutate(Total_2decimales = round(Total, 2),
+         csum = rev(cumsum(rev(Total_2decimales))),
+         posicion = Total_2decimales/2 + lead(csum, 1))%>%
+  mutate(posicion = ifelse(is.na(posicion), Total_2decimales/2, posicion))
+
+library(ggrepel)
+
+p_2004 <- ggplot(df_04, aes(x = "", y = Total, fill = fct_inorder(Regimen_tenencia))) +
+  geom_col(width = 1) +
+  labs(fill = NULL) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3") +
+  geom_text(data = df_04,
+            aes(y = Total, label = paste0(Total, "%")),
+            position = position_stack(vjust = 0.5),
+            size = 4, show.legend = FALSE) + 
+  theme_void() +
+  theme(legend.position = "none")
+
+
+p_2008 <- ggplot(df_08, aes(x = "", y = Total, fill = fct_inorder(Regimen_tenencia))) +
+  geom_col(width = 1) +
+  labs(fill = NULL) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3")  +
+  geom_text(data = df_08,
+            aes(y = Total, label = paste0(Total, "%")),
+            position = position_stack(vjust = 0.5),  # Ajuste vertical
+            size = 4, show.legend = FALSE) +
+  theme_void()
+
+p_2010 <- ggplot(df_10, aes(x = "", y = Total, fill = fct_inorder(Regimen_tenencia))) +
+  geom_col(width = 1) +
+  labs(fill = NULL) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3") +
+  geom_text(data = df_10,
+            aes(y = Total, label = paste0(Total, "%")),
+            position = position_stack(vjust = 0.5),  # Ajuste vertical
+            size = 4, show.legend = FALSE) +
+  theme_void() +
+  theme(legend.position = "none")
+
+p_2017<- ggplot(df_17, aes(x = "", y = Total, fill = fct_inorder(Regimen_tenencia))) +
+  geom_col(width = 1) +
+  labs(fill = NULL) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3") +
+  geom_text(data = df_17,
+            aes(y = Total, label = paste0(Total, "%")),
+            position = position_stack(vjust = 0.5),
+            size = 4, show.legend = FALSE) +
+  theme_void() +
+  theme(legend.position = "none")
+
+library(patchwork)
+
+combined_plot <- p_2004 + p_2008 + p_2010 + p_2017 +
+  plot_annotation(
+    title = "Evolución  de la tenencia de la Vivienda (%)",
+    subtitle = "(2004,2008,2010,2017)",
+    caption = "Fuente: INE"
+  )
+
+combined_plot
+```
+
+## Precio del Alquiler por provincias
+
+```{r}
+
+datos4<- "./datos/datos4.csv"
+datos4<- rio::import(datos4)
+
+p4<- ggplot(datos4, aes(x = reorder(Parámetro, -Cuantia_media), y = Cuantia_media)) + geom_bar(stat = "identity", fill = "skyblue") +  
+  labs(title = "Precio del Alquiler por provincia (2018)",
+       x = "Provincia",
+       y = "Precio medio Alquiler",
+       caption = "Ministerio de Fomento, Gobierno de España") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p4
+```
+
+## Índice de Precios de la Vivienda por CCAA
+
+```{r}
+#######MAPA
+library(sf)
+library(tidyverse)
+library(pjpv.curso.R.2022)
+
+
+###cargamos los datos 
+datos_c<- "./datos/prueba.csv"
+datos_c<- rio::import(datos_c)
+
+### En la columna Total queremos poner un punto en vez de una coma 
+
+datos_c <- datos_c%>% mutate(Total = stringr::str_replace(Total, "," , "." ))
+
+#- Cambiamos el nombre de las columnas 
+
+df_c<- datos_c %>% rename(Indice_precio = Total) %>% rename(CCAA = Comunidades_Autonomas)
+
+###Separamos la columna de CCAA en dos Columnas, una que muestre el código y otra el nombre de la Comunidad Autonoma  
+
+df_c <- df_c %>%
+  tidyr::separate(CCAA, sep = " ",
+                  into = c("ine_ccaa", "ine_ccaa.n"), extra = "merge")
+df_c<-  drop_na(df_c) #quitamos el total nacional, ya que no se van a utilizar
+
+df_c<- df_c %>% filter(General == "General") %>% filter( Índices_tasas =="Media anual") %>% filter(Periodo == "2022") ##cogemos las viviendas generales, la media anual y elegimos el año más reciente que es 2022
+
+
+###Cargamos las geometrías y elegimos las variables que nos interesan
+df_geo_prov <- pjpv.curso.R.2022::LAU2_prov_2020_canarias
+df_geo_prov <- df_geo_prov %>% select(ine_prov, ine_prov.n, ine_ccaa, ine_ccaa.n)
+
+##Agregamos geometrías de las Comunidades Autonomas 
+
+df_geo_ccaa <- df_geo_prov %>% group_by(ine_ccaa, ine_ccaa.n) %>% summarize()
+df_ok <- left_join(df_geo_ccaa, df_c, by = c("ine_ccaa" = "ine_ccaa"))
+names(df_ok)
+
+##Calculamos los Centroides
+library(sf)
+df_geo_ccaa <- cbind(df_geo_ccaa, st_coordinates(st_centroid(df_geo_ccaa$geometry)))
+
+##Juntamos los datos de los precios de los alquileres con las geometrías 
+df_ok <- left_join(df_geo_ccaa, df_c, by = c("ine_ccaa" = "ine_ccaa"))
+df_ok$Indice_precio <- as.numeric(df_ok$Indice_precio)
+p <- ggplot() + 
+  geom_sf(data = df_ok, 
+          aes(geometry = geometry, fill = Indice_precio), 
+          color = "white", size = 0.09) + 
+  coord_sf(xlim = c(-10.00, 5.00), ylim = c(35, NA), expand = TRUE) +
+  scale_fill_continuous(low="white",
+                        high="navyblue",
+                        limits = c(100,160)) +
+  theme_minimal() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) + 
+  labs(title = "Índice de Precios de la Vivienda por Comunidades Autónomas", 
+       subtitle = "(2022)",
+       fill = "Índice",
+       caption = "Fuente: INE")
+p
+```
+
+## Índice de Precios del Alquiler por CCAA
+
+```{r}
+##Otro Mapa pero ahora del Indice de Precios de Alquiler 
+datos_alquiler<- "./datos/59057.csv"
+datos_alquiler<- rio::import(datos_alquiler)
+
+##Cambiamos la coma por el punto en la columna Total
+datos_alquiler<- datos_alquiler%>% mutate(Total = stringr::str_replace(Total, "," , "." ))
+
+##Separamos la columna de CCAA en dos Columnas, una que muestre el código y otra el nombre de la Comunidad Autonoma  
+
+datos_alquiler <- datos_alquiler %>%
+  tidyr::separate(CCAA, sep = " ",
+                  into = c("ine_ccaa", "ine_ccaa.n"), extra = "merge") 
+
+##Quitamos Total Nacional (que no lo necesitamos)
+
+datos_alquiler<- drop_na(datos_alquiler)
+
+##Cogemos las variables que nos interesan, filtramos por Indice y filtramos por el año 2021(es el más reciente)
+
+datos_alquiler<- datos_alquiler %>%
+  filter(Tamaño == "Total") %>%
+  filter(Dato =="Índice") %>% 
+  filter(Periodo == 2021) %>%
+  select(ine_ccaa, ine_ccaa.n, Total)
+
+###Cargamos las geometrías y elegimos las variables que nos interesan
+df_geo_prov <- pjpv.curso.R.2022::LAU2_prov_2020_canarias
+df_geo_prov <- df_geo_prov %>% select(ine_prov, ine_prov.n, ine_ccaa, ine_ccaa.n)
+
+##Agregamos geometrías de las Comunidades Autonomas 
+
+df_geo_ccaa <- df_geo_prov %>% group_by(ine_ccaa, ine_ccaa.n) %>% summarize() 
+df_ok <- left_join(df_geo_ccaa, datos_alquiler, by = c("ine_ccaa" = "ine_ccaa"))
+names(df_ok)
+
+##Calculamos los Centroides
+library(sf)
+df_geo_ccaa <- cbind(df_geo_ccaa, st_coordinates(st_centroid(df_geo_ccaa$geometry)))
+
+##Juntamos los datos de los precios de los alquileres con las geometrías 
+df_ok <- left_join(df_geo_ccaa, datos_alquiler, by = c("ine_ccaa" = "ine_ccaa"))
+
+##Gráfico
+df_ok$Total <- as.numeric(df_ok$Total)
+p <- ggplot() + 
+  geom_sf(data = df_ok, 
+          aes(geometry = geometry, fill = Total), 
+          color = "white", size = 0.09) + 
+  coord_sf(xlim = c(-10.00, 5.00), ylim = c(35, NA), expand = TRUE) +
+  scale_fill_continuous(low="white",high="orange") +
+  theme_minimal() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) + 
+  labs(title = "Índice de Precios del Alquiler  por Comunidades Autónomas", 
+       subtitle = "(2021)",
+       fill = "Índice",
+       caption = "Fuente: INE")
+p
+
+```

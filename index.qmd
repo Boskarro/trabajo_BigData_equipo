@@ -1,0 +1,21 @@
+---
+title: TRABAJO BIGDATA             #- Hay que cambiarlo
+image: images/houses-logo-illustration-free-vector.jpg
+about:
+  template: broadside       #- {jolla, solana, ...}
+  image-width: 20em        #- https://cybmeta.com/em-y-rem
+  image-shape: rectangle    #- {rectangle, round, rounded}
+---
+        
+Hola, somos Javier Belenguer Esteban y Juan Bosco Pujol Cerdá.
+      
+Esta web sirve para presentar el trabajo en equipo para la asignatura "Programación y manejo de datos en la era Del Big Data", optativa de GECO en la Facultad de Economía de la Universitat de València.
+
+La web de la asignatura está [aquí](https://perezp44.github.io/intro-ds-23-24-web/){target="_blank"} y los trabajos de mis compañeros de curso puedes verlos [aquí](https://perezp44.github.io/intro-ds-23-24-web/05-trabajos-estudiantes.html){target="_blank"}.
+
+
+Nuestro trabajo lleva por título : **"El precio del alquiler en España"**. El objetivo es hacer un análisis sobre la evolución del alquiler de la vivienda español, de la ley de viviendas, y de los problemas que afronta la población al respecto.
+
+
+El trabajo puede verse [aquí](web_alquileres.html), y las slides [aquí](slides_trabajo.html){target="_blank"}. También puedes clicar en la navbar (parte superior derecha) cualquiera de los dos iconos para acceder a estos.
+---
