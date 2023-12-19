@@ -8,7 +8,7 @@ Repo utilizado para elaborar el trabajo en equipo para la asignatura "Programaci
 
 
 
-La versión final del trabajo puede visualizarse en: https://perezp44.github.io/intro-ds-23-24-web/.
+La versión final del trabajo puede visualizarse en: https://boskarro.github.io/trabajo_BigData_equipo/.
 
 
 
